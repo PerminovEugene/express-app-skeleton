@@ -27,6 +27,7 @@
     "cookie-parser": "^1.4.3",
     "crypto-js": "^3.1.9-1",
     "express": "^4.14.1",
+    "node-twitter": "^0.5.3",
     "passport-local": "^1.0.0"
   }
 }
