@@ -7,7 +7,12 @@ const isValidPassword = (password, cipherText, salt) => {
 };
 
 const service = {
-    
+    /**
+     * That function is callback for passport local authorisation strategy
+     * @param username {string}
+     * @param password {string}
+     * @param done
+     */
     login: function (username, password, done) {
         userRepository
             .findUser({username: username})
@@ -25,7 +30,32 @@ const service = {
             });
         
     },
+    /**
+     * That function is callback for passport twitter authorisation strategy
+     * @param token
+     * @param tokenSecret
+     * @param profile
+     * @param done
+     */
+    loginViaTwitter: (token, tokenSecret, profile, done) => {
+        console.log(token);
+        console.log(tokenSecret);
+        console.log(profile);
+        userRepository.findOrCreate(token, tokenSecret, profile)
+            .then((user) => {
+                done(null, user);
+            })
+            .catch((error) => {
+                return done(error)
+            });
+    },
     
+    /**
+     * Function for check is authorised user or not
+     * @param req
+     * @param res
+     * @param next
+     */
     loggedIn: (req, res, next) => {
         if (req.user) {
             next();

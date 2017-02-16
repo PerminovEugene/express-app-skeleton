@@ -4,5 +4,9 @@ module.exports = {
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
         res.json({success: true});
+    },
+    afterTwitterLogin: (req, res) => {
+        console.log(req, res)
+        res.send(req.user);
     }
 };
