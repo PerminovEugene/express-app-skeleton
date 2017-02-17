@@ -1,23 +1,18 @@
-const APP_PORT = 8081
-    , cookieParser = require('cookie-parser')
-    , bodyParser = require('body-parser')
-    , session = require('express-session')
-    , routesModule = require('./app/routes/index');
-
+const  routesModule = require('./app/routes/index')
+    , dotenv = require('dotenv')
+    , appConfigurator = require('./app_configurator');
 
 let express = require('express');
 let app = express();
+// app.use(express.static('public'));
 
-app.use(express.static('public'));
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'qwqdqwqdw' }));
+dotenv.load({ path: './app/configs/.env' });
+
+appConfigurator.configure(app);
 
 routesModule.addRoutes(app);
 
-
-var server = app.listen(APP_PORT, function () {
+let server = app.listen(process.env.APP_PORT, function () {
     let host = server.address().address;
     let port = server.address().port;
     
@@ -27,8 +22,6 @@ var server = app.listen(APP_PORT, function () {
 /*
     TODO:
     1) Add comments
-    2) Add another strategy for passport auth
-    3) Add config with available passport strategies
     4) Move configurations from that file to config.js
     5) Add endpoint for logout
     6) Add tests on endpoints

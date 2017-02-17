@@ -1,0 +1,19 @@
+{
+  "fields": {
+    "email": {
+      "type": "String"
+    },
+    "password": {
+      "type": "String"
+    },
+    "firstName": {
+      "type": "String"
+    },
+    "lastName": {
+      "type": "String"
+    },
+    "patronymic": {
+      "type": "String"
+    }
+  }
+}
