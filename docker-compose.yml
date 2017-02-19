@@ -8,7 +8,7 @@ services:
     working_dir: /usr/src/app
     command: sh -c 'npm i && npm install -g nodemon && nodemon index.js'
     ports:
-      - "3000:3000"
+      - "8081:8081"
     depends_on:
       - mongo
     networks:

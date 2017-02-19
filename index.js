@@ -1,4 +1,5 @@
 const  routesModule = require('./app/routes/index')
+    , dbModule = require('./app/utils/mongoose')
     , dotenv = require('dotenv')
     , appConfigurator = require('./app_configurator');
 
@@ -9,6 +10,12 @@ let app = express();
 dotenv.load({ path: './app/configs/.env' });
 
 appConfigurator.configure(app);
+
+const dbUtil  = new dbModule.MongooseUtil();
+dbUtil.initialize()
+    .catch((error) => {
+        console.log(error)
+    })
 
 routesModule.addRoutes(app);
 

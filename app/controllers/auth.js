@@ -6,7 +6,6 @@ module.exports = {
         res.json({success: true});
     },
     afterTwitterLogin: (req, res) => {
-        console.log(req, res)
         res.send(req.user);
     }
 };
