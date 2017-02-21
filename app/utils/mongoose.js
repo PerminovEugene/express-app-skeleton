@@ -1,14 +1,19 @@
 const mongoose = require('mongoose')
-    , modelsBuilder = require('./../models/models_builder');
-
+    , modelsBuilder = require('./../models/models_builder')
+    , _  = require('lodash');
 
 module.exports.MongooseUtil = class MongooseUtil {
+    
+    constructor() {
+        this._db;
+    }
     
     connectToDB() {
         return new Promise((resolve, reject) => {
             try {
+                mongoose.Promise = global.Promise;
                 console.log('connect to: ', process.env.MONGO_URI);
-                mongoose.connect(process.env.MONGO_URI);
+                this._db = mongoose.connect(process.env.MONGO_URI);
 
                 mongoose.connection.on('error', () => {
                     console.error.bind(console, 'connection error:');
@@ -16,9 +21,11 @@ module.exports.MongooseUtil = class MongooseUtil {
                 });
                 mongoose.connection.once('open', () => {
                     console.log('connected to mongoose');
+                    return resolve();
                 });
                 mongoose.connection.on('disconnected', function () {
                     console.log('Mongoose default connection disconnected');
+                    return reject('Mongoose default connection disconnected')
                 });
                 
                 // If the Node process ends, close the Mongoose connection
@@ -28,31 +35,27 @@ module.exports.MongooseUtil = class MongooseUtil {
                         process.exit(0);
                     });
                 });
+                
             }
             catch (error) {
                 return reject(error);
             }
-            
-            // Mongoose.Promise = global.Promise;
         })
     }
     
-    addSchemasToDB() {
-        return new Promise((resolve, reject) => {
-            console.log('in addSchemasToDB');
-            resolve()
-        })
-    }
+    /**
+     *
+     * @param schemas {array} must contain schemas in mongoose format
+     * @return {Promise}
+     */
+
     
     initialize() {
         let that = this;
         return new Promise((resolve, reject) => {
             that.connectToDB()
                 .then(() => {
-                    return modelsBuilder.getAllSchemas();
-                })
-                .then((mergedSchemaJson) => {
-                    return this.addSchemasToDB(mergedSchemaJson);
+                    return modelsBuilder.addModelsToDB(this._db);
                 })
                 .catch((error) => {
                     return reject(error);

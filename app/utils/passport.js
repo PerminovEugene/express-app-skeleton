@@ -1,5 +1,5 @@
 const authModule = require('./../servises/auth')
-    , userRepository = require('./../repository/user')
+    , userService = require('./../servises/user')
     , authConfig = require('./../configs/auth.json')
     , twitterConfig = require('./../configs/twitter.json')
     , _ = require('lodash')
@@ -22,9 +22,10 @@ const localStrategyHandler = () => {
     });
     
     passport.deserializeUser(function(id, done) {
-        userRepository
+        userService
             .findById(id)
             .then((user) => {
+                console.log(user)
                 done(null, user);
             })
             .catch((error) => {
@@ -32,10 +33,13 @@ const localStrategyHandler = () => {
             });
     });
     
-    passport.use(new LocalStrategy(authModule.login));
+    passport.use(new LocalStrategy({
+        usernameField: 'email',
+        passwordField: 'password'
+    }, authModule.login));
 };
 
-const twitterStrategyhandler = () => {
+const twitterStrategyHandler = () => {
     
     passport.use(new TwitterStrategy({
             consumerKey: twitterConfig.consumerKey,
@@ -48,5 +52,5 @@ const twitterStrategyhandler = () => {
 
 const passportStrategiesHandlers = {
     "local": localStrategyHandler,
-    "twitter": twitterStrategyhandler
+    "twitter": twitterStrategyHandler
 };

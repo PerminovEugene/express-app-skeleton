@@ -1,47 +1,34 @@
-const glob = require('glob')
-    , fs = require("fs");
+const account = require('./account')
+    , twitterProfile = require('./twitter_profile')
+    , mongoose = require('mongoose')
+    , _ = require('lodash');
 
-const parseModel = () => {
-    return parseModel()
-};
+// const getAllSchemas = () => {
+//     const schemas = {};
+//     schemas[twitterProfile.getSchemaName()] = twitterProfile.getSchema();
+//
+//     schemas[account.getSchemaName()] = account.getSchema();
+//     return schemas;
+// }
+let models = {};
+
 
 module.exports = {
     getAllSchemas: () => {
-        // return new Promise((resolve, reject) => {
-            this.mergeSchemasJson()
-                .then((result) => {
-                    return this.parseToSchemas(result);
-                })
-                .catch((error) => {
-                    // return reject(error);
-                    return error
-                });
-        // });
+        const schemas = {};
+        schemas[twitterProfile.getSchemaName()] = twitterProfile.getSchema();
+    
+        schemas[account.getSchemaName()] = account.getSchema();
+        return schemas;
     },
-    mergeSchemasJson: () => {
+    addModelsToDB(db) {
         return new Promise((resolve, reject) => {
-            const files = glob.sync(path + "./*.json");
-            let schema = {};
-            files.forEach(function (file) {
-                let content;
-                let parsedContent;
-                try {
-                    content = fs.readFileSync(file);
-                    parsedContent = JSON.parse(content);
-                } catch (e) {
-                    reject(new Error('Can not parse schema: ' + e + " in file " + file + '.'));
-                }
-                schema = merge.recursive(true, schema, parsedContent);
+            const schemas = this.getAllSchemas();
+            _.each(schemas, (schema, name) => {
+                models[name] = db.model(name, new mongoose.Schema(schema));
             });
-            return resolve(schema);
-        });
-    },
-    
-    parseToSchemas: (mergedSchemaJson) => {
-        return new Promise((resolve, reject) => {
-            console.log(mergedSchemaJson)
             resolve()
-        });
-    }
-    
+        })
+    },
+    models: models
 };

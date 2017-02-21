@@ -1,5 +1,6 @@
 const passport = require('./../utils/passport').initialize()
-    , authController = require('./../controllers/auth');
+    , authController = require('./../controllers/auth')
+    , auth = require('./../servises/auth');
 
 module.exports = (app) => {
     
@@ -8,6 +9,9 @@ module.exports = (app) => {
     
     // local strategy
     app.post('/login', passport.authenticate('local'), authController.login);
+    app.post('/logout', auth.loggedIn, authController.logout);
+    app.post('/registration', authController.registration);
+
 
     // twitter strategy
     // Redirect the user to Twitter for authentication.  When complete, Twitter
@@ -22,4 +26,6 @@ module.exports = (app) => {
     app.get('/auth/twitter/callback',
         passport.authenticate('twitter'), authController.afterTwitterLogin
     );
+    
+    app.post('/delete-account', auth.loggedIn, authController.deleteAccount);
 };
