@@ -8,8 +8,12 @@ module.exports = (app) => {
     app.use(passport.session());
     
     // local strategy
+    // expected attributes in body: email, password
     app.post('/login', passport.authenticate('local'), authController.login);
+    
     app.post('/logout', auth.loggedIn, authController.logout);
+    
+    // expected attributes in body: email, password, passwordConfirm, firstName, lastName
     app.post('/registration', authController.registration);
 
 

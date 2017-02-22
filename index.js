@@ -1,7 +1,8 @@
 const  routesModule = require('./app/routes/index')
     , dbModule = require('./app/utils/mongoose')
     , dotenv = require('dotenv')
-    , appConfigurator = require('./app_configurator');
+    , appConfigurator = require('./app_configurator')
+    , logger = require('./app/utils/logger')
 
 let express = require('express');
 let app = express();
@@ -15,9 +16,41 @@ const dbUtil  = new dbModule.MongooseUtil();
 dbUtil.initialize()
     .catch((error) => {
         console.log(error)
-    })
+    });
 
 routesModule.addRoutes(app);
+
+app.use((err, req, res, next) => {
+    if (err.statusCode === 500) {
+        logger.error(
+            "GENERATED NEW UNHANDLED ERROR: \n",
+            err,
+            "\n REQUEST INFORMATION:",
+            "\n URL: ", req.url,
+            "\n USER: ", req.user,
+            "\n SESSION: ", req.session,
+            "\n BODY: ", req.body,
+            "\n ADDRESS: ", req.connection.remoteAddress
+        );
+    }
+    res.status(err.statusCode).send({message: err.message});
+});
+
+process.on('uncaughtException', function (err) {
+    logger.error(
+        "UncaughtException: ",
+        err,
+        "\n Please process this error!");
+});
+
+process.on('unhandledRejection', (reason, p) => {
+    logger.error(
+        'Unhandled Rejection at: Promise',
+        p,
+        '\n REASON:',
+        reason,
+        "\n Please process this error!");
+});
 
 let server = app.listen(process.env.APP_PORT, function () {
     let host = server.address().address;

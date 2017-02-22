@@ -5,18 +5,22 @@ module.exports = {
     return {
       email: {
         type: String,
+        max: 60
       },
       password: {
-        type: String
+        type: String,
+        max: 16,
+        min: 6
       },
       firstName: {
-        type: String
+        type: String,
+        max: 200,
+        min: 1
       },
       lastName: {
-        type: String
-      },
-      patronymic: {
-        type: String
+        type: String,
+        max: 200,
+        min: 1
       },
       isActive: {
         type: Boolean,

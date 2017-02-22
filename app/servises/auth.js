@@ -4,10 +4,9 @@ const userService = require('./../servises/user')
     , allModels = require('./../models/models_builder').models
     , accountSchema = require('./../models/account')
     , twitterProfileSchema = require('./../models/twitter_profile')
-    , errorServcie = require('./errorHandlerService');
+    , errorService = require('./errorHandlerService');
 
 const isValidPassword = (password, cipherText, salt) => {
-    console.log(password, cipherText, salt)
     const hash = cryptoFacade.hashSync(password, salt);
     return cipherText === hash;
 };
@@ -29,7 +28,7 @@ const service = {
     login: function (username, password, done) {
         let userModel = allModels[accountSchema.getSchemaName()];
         userModel
-            .findOne({email: username})
+            .findOne({email: username, isActive: true})
             .exec((error, user) => {
                 if (user === null) {
                     return done(null, false, {message: 'Incorrect username.'});
@@ -56,20 +55,20 @@ const service = {
         twitterProfileModel
             .findOne(queue)
             .populate('account') //TODO how remove hardcode?
-            .exec((error, foundProfile) => {
-                errorServcie.doneErrorHandler(error, done);
+            .exec((err, foundProfile) => {
+                errorService.handleError(err, 500, "ER006", done);
                 const callback = (newUser, newProfile) => {
                     done(null, buildSessionData(newUser, newProfile));
                 };
                 if (foundProfile === null) {
-                    userService.createNewProfileAndAccount(token, tokenSecret, profile, callback);
+                    userService.createNewProfileAndAccount(token, tokenSecret, profile, callback, done);
                 }
                 else {
                     if (foundProfile.account) {
                         callback(foundProfile.account, foundProfile);
                     }
                     else {
-                        userService.addAccountToTwitterProfile(foundProfile, callback);
+                        userService.addAccountToTwitterProfile(foundProfile, callback, done);
                     }
                 }
                
@@ -86,14 +85,20 @@ const service = {
         if (req.user) {
             next();
         } else {
-            res.send(401, {"message": "Not authorised"});
+            next(errorService.new(401));
         }
     },
     
     loggedOut: (req) => {
-        return new Promise((resolve) => {
-            req.logout();
-            resolve()
+        return new Promise((resolve, reject) => {
+            try {
+                req.logout();
+                resolve();
+            }
+            catch (error) {
+                reject(errorService.new(500, {code: "ER002", reason: error}));
+            }
+            
         });
     }
 };

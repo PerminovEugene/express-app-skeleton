@@ -40,7 +40,6 @@ const localStrategyHandler = () => {
 };
 
 const twitterStrategyHandler = () => {
-    
     passport.use(new TwitterStrategy({
             consumerKey: twitterConfig.consumerKey,
             consumerSecret: twitterConfig.consumerSecret,

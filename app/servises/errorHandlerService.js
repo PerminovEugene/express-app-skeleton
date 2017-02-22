@@ -1,9 +1,17 @@
+const createError = require('http-errors');
+
 module.exports = {
-    doneErrorHandler: (error, done, message) => {
-        if (error) {
-            console.log(message);
-            console.log(error);
-            done(error);
+    handleError: (err, httpCode, errorCode, handler) => {
+        if (err) {
+            return handler(createError(httpCode, {code: errorCode, reason: err}));
+        }
+    },
+    "new": (code, message) => {
+        if (typeof code === "number") {
+            return createError(code, message)
+        }
+        if (typeof code === "string") {
+            return new createError[code](message)
         }
     }
-}
+};

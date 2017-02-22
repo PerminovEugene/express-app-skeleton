@@ -43,13 +43,7 @@ module.exports.MongooseUtil = class MongooseUtil {
         })
     }
     
-    /**
-     *
-     * @param schemas {array} must contain schemas in mongoose format
-     * @return {Promise}
-     */
 
-    
     initialize() {
         let that = this;
         return new Promise((resolve, reject) => {

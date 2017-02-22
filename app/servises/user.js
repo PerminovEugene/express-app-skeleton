@@ -6,9 +6,6 @@ const cryptoFacade = require('./../facades/crypto')
     , Types = require('mongoose').Types
     , errorService = require('./errorHandlerService');
 
-const salt = cryptoFacade.genSaltSync(16);
-let fakeUser = {username: 'foo', password: "13", id: 1, salt: salt};
-fakeUser.password = cryptoFacade.hashSync(fakeUser.password, salt);
 
 const isPasswordEqualPasswordConfirm = (body) => {
     return body.password === body.passwordConfirm
@@ -28,54 +25,61 @@ const generateTwitterProfile =(body) => {
     return new twitterProfileModel(body);
 };
 
-module.exports = {
-
-    findById: (id) => {
-        return new Promise((resolve, reject) => {
+const findUserById = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
             let userModel = allModels[accountSchema.getSchemaName()];
             userModel.findById(id, (error, user) => {
-                if (error) {
-                    return reject(error)
-                }
+                errorService.handleError(error, 500, "ER003", reject);
                 return resolve(user);
             });
-        });
+        }
+        catch (err) {
+            return reject(errorService.new(500, {code: "ER004", reason: err}));
+        }
+    });
+};
+
+module.exports = {
+
+    findById: findUserById,
+    
+    createNewProfileAndAccount: (token, tokenSecret, profile, callback, done) => {
+        try {
+            let newProfile = generateTwitterProfile({
+                _id: Types.ObjectId(),
+                token: token,
+                tokenSecret: tokenSecret,
+                profile: profile
+            });
+            let newUser = generateUser({
+                _id: Types.ObjectId(),
+                twitterProfile: newProfile._id
+            });
+            newProfile.account = newUser._id;
+       
+            newProfile.save((newProfileSaveError) => {
+                errorService.handleError(newProfileSaveError, 500, "ER007", done);
+                newUser.save((newUserSaveError) => {
+                    errorService.handleError(newUserSaveError, 500, "ER008", done);
+                    callback(newUser, newProfile);
+                });
+            });
+        } catch (err) {
+            errorService.new(500, {code: "ER005", reason: err})
+        }
     },
     
-    createNewProfileAndAccount: (token, tokenSecret, profile, callback) => {
-        let newProfile = generateTwitterProfile({
-            _id: Types.ObjectId(),
-            token: token,
-            tokenSecret: tokenSecret,
-            profile: profile
-        });
-        let newUser = generateUser({
-            _id: Types.ObjectId(),
-            twitterProfile: newProfile._id
-        });
-        newProfile.account = newUser._id;
-    
-        newProfile.save((newProfileSaveError) => {
-            errorService.doneErrorHandler(newProfileSaveError, done, 'new profile save error');
-            newUser.save((newUserSaveError) => {
-                errorService.doneErrorHandler(newUserSaveError, done, 'new user save error');
-                callback(newUser, newProfile);
-            })
-        })
-    },
-    
-    addAccountToTwitterProfile: (foundProfile, callback) => {
+    addAccountToTwitterProfile: (foundProfile, callback, done) => {
         let newUser = generateUser({
             _id: Types.ObjectId(),
             twitterProfile: foundProfile._id
         });
         newUser.save((saveNewUserError) => {
-            errorService.doneErrorHandler(saveNewUserError, done, 'new user save error');
+            done(errorService.new(500, {code: "ER008", reason: saveNewUserError}));
             foundProfile.account = newUser._id;
             foundProfile.save((updateProfileError) => {
-                if (updateProfileError) {
-                    errorService.doneErrorHandler(updateProfileError, done, 'update twitter profile error');
-                }
+                errorService.handleError(updateProfileError, 500, "ER009", done);
                 callback(newUser, foundProfile);
             });
         });
@@ -83,24 +87,37 @@ module.exports = {
     
     registration: (body) => {
         return new Promise( (resolve, reject) => {
-            if (!isPasswordEqualPasswordConfirm(body)) {
-                return reject({error: "Password not equal confirm password"});
-            }
-            let newUser = generateUser(body);
-            newUser.save((error) => {
-                if (error) {
-                    return reject(error);
+            try {
+                if (!isPasswordEqualPasswordConfirm(body)) {
+                    return reject(errorService.new(400, {message: "Password not equal confirm password"}));
                 }
-                return resolve(newUser);
-            })
+                let newUser = generateUser(body);
+                newUser.save((error) => {
+                    errorService.handleError(error, 400, "ER010", reject);
+                    return resolve(newUser);
+                })
+            } catch (err) {
+                reject(errorService.new(500, {code: "ER011", reason: err}));
+            }
         });
     },
     
-    deleteAccount: (sessionUser) => {
+    deleteAccount: (reqUser) => {
         return new Promise( (resolve, reject) => {
-            
+            findUserById(reqUser.id)
+                .then((user) => {
+                    if (user === null) {
+                        return reject(errorService.new(500, {code: "ER015", reason: "user try logout, but he's id not exist in db"}))
+                    }
+                    user.isActive = false;
+                    user.save((saveError) => {
+                        errorService.handleError(saveError, 500, "ER012", reject);
+                        return resolve();
+                    });
+                })
+                .catch((err) => {
+                    reject(err);
+                })
         });
     },
-    
-    
 };

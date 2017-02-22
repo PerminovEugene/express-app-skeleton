@@ -3,15 +3,7 @@ const account = require('./account')
     , mongoose = require('mongoose')
     , _ = require('lodash');
 
-// const getAllSchemas = () => {
-//     const schemas = {};
-//     schemas[twitterProfile.getSchemaName()] = twitterProfile.getSchema();
-//
-//     schemas[account.getSchemaName()] = account.getSchema();
-//     return schemas;
-// }
 let models = {};
-
 
 module.exports = {
     getAllSchemas: () => {
