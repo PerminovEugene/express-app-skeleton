@@ -1,5 +1,5 @@
-const logger = require('log4js').getLogger()
-    , _ = require('lodash');
+const logger = require('log4js').getLogger(),
+    _ = require('lodash');
 
 module.exports = {
     error: (...arg) => {

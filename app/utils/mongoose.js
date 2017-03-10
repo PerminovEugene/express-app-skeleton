@@ -1,13 +1,17 @@
-const mongoose = require('mongoose')
-    , modelsBuilder = require('./../models/models_builder')
-    , _  = require('lodash');
+const mongoose = require('mongoose');
+const modelsBuilder = require('./../models/models_builder');
 
-module.exports.MongooseUtil = class MongooseUtil {
-    
+module.exports.MongooseUtil = class {
+    /**
+     * Initalize private variable _db.
+     */
     constructor() {
         this._db;
     }
-    
+    /**
+     * Connect application to database.
+     * @return {Promise}
+     */
     connectToDB() {
         return new Promise((resolve, reject) => {
             try {
@@ -17,33 +21,36 @@ module.exports.MongooseUtil = class MongooseUtil {
 
                 mongoose.connection.on('error', () => {
                     console.error.bind(console, 'connection error:');
-                    return reject({code: "dbError", reason: "Cannot connect to db"})
+                    return reject({
+                        code: 'dbError',
+                        reason: 'Cannot connect to db',
+                    });
                 });
                 mongoose.connection.once('open', () => {
                     console.log('connected to mongoose');
                     return resolve();
                 });
-                mongoose.connection.on('disconnected', function () {
+                mongoose.connection.on('disconnected', function() {
                     console.log('Mongoose default connection disconnected');
-                    return reject('Mongoose default connection disconnected')
+                    return reject('Mongoose default connection disconnected');
                 });
-                
                 // If the Node process ends, close the Mongoose connection
                 process.on('SIGINT', function() {
-                    mongoose.connection.close(function () {
-                        console.log('Mongoose default connection disconnected through app termination');
+                    mongoose.connection.close(function() {
+                        console.log('Mongoose default connection ' +
+                            + 'disconnected through app termination');
                         process.exit(0);
                     });
                 });
-                
-            }
-            catch (error) {
+            } catch (error) {
                 return reject(error);
             }
-        })
+        });
     }
-    
-
+    /**
+     * Connect application to db and  initialize models.
+     * @return {Promise}
+     */
     initialize() {
         let that = this;
         return new Promise((resolve, reject) => {
@@ -53,8 +60,7 @@ module.exports.MongooseUtil = class MongooseUtil {
                 })
                 .catch((error) => {
                     return reject(error);
-                })
+                });
         });
-        
     }
 };

@@ -36,7 +36,8 @@
     "glob": "7.1.1",
     "mongoose": "4.8.3",
     "log4js": "1.1.0",
-    "http-errors": "1.6.1"
+    "http-errors": "1.6.1",
+    "eslint": "3.17.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
