@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const modelsBuilder = require('./../models/models_builder');
+const mongoose = require('mongoose'),
+    modelsBuilder = require('./../models/models_builder');
 
-module.exports.MongooseUtil = class {
+module.exports.MongooseUtil = class MongooseUtil {
     /**
-     * Initalize private variable _db.
+     * Initalize private variabale _db.
      */
     constructor() {
         this._db;
@@ -15,7 +15,7 @@ module.exports.MongooseUtil = class {
     connectToDB() {
         return new Promise((resolve, reject) => {
             try {
-                mongoose.Promise = global.Promise;
+                mongoose.Promise = global.Promise;process.env.MONGO_URI
                 console.log('connect to: ', process.env.MONGO_URI);
                 this._db = mongoose.connect(process.env.MONGO_URI);
 
@@ -31,7 +31,7 @@ module.exports.MongooseUtil = class {
                     return resolve();
                 });
                 mongoose.connection.on('disconnected', function() {
-                    console.log('Mongoose default connection disconnected');
+                    console.log('Mongo process.env.MONGO_URI default connection disconnected');
                     return reject('Mongoose default connection disconnected');
                 });
                 // If the Node process ends, close the Mongoose connection
