@@ -1,10 +1,10 @@
-const userService = require('./../servises/user')
-    , cryptoFacade = require('./../facades/crypto')
-    , _ = require('lodash')
-    , allModels = require('./../models/models_builder').models
-    , accountSchema = require('./../models/account')
-    , twitterProfileSchema = require('./../models/twitter_profile')
-    , errorService = require('./errorHandlerService');
+const userService = require('./../servises/user');
+const cryptoFacade = require('./../facades/crypto');
+const _ = require('lodash');
+const allModels = require('./../models/models_builder').models;
+const accountSchema = require('./../models/account');
+const twitterProfileSchema = require('./../models/twitter_profile');
+const errorService = require('./errorHandlerService');
 
 const isValidPassword = (password, cipherText, salt) => {
     const hash = cryptoFacade.hashSync(password, salt);
@@ -13,7 +13,8 @@ const isValidPassword = (password, cipherText, salt) => {
 
 const buildSessionData = (account, twitterProfile) => {
     let data = {};
-    data.displayed = account.firstName && account.lastName ? account.firstName + " " + account.lastName : twitterProfile.profile.displayName;
+    data.displayed = account.firstName && account.lastName ?
+        account.firstName + ' ' + account.lastName : twitterProfile.profile.displayName;
     data.id = account.id;
     return data;
 };

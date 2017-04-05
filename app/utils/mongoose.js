@@ -31,7 +31,7 @@ module.exports.MongooseUtil = class MongooseUtil {
                     return resolve();
                 });
                 mongoose.connection.on('disconnected', function() {
-                    console.log('Mongo process.env.MONGO_URI default connection disconnected');
+                    console.log('Mongo connection disconnected');
                     return reject('Mongoose default connection disconnected');
                 });
                 // If the Node process ends, close the Mongoose connection

@@ -7,12 +7,6 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
 
-module.exports.initialize = () => {
-    _.each(authConfig.enabledStrategies, (strategyName) => {
-        passportStrategiesHandlers[strategyName]();
-    });
-    return passport;
-};
 
 const localStrategyHandler = () => {
     passport.serializeUser(function(user, done) {
@@ -47,4 +41,11 @@ const twitterStrategyHandler = () => {
 const passportStrategiesHandlers = {
     local: localStrategyHandler,
     twitter: twitterStrategyHandler,
+};
+
+module.exports.initialize = () => {
+    _.each(authConfig.enabledStrategies, (strategyName) => {
+        passportStrategiesHandlers[strategyName]();
+    });
+    return passport;
 };
