@@ -1,5 +1,5 @@
-const mongoose = require('mongoose'),
-    modelsBuilder = require('./../models/models_builder');
+const mongoose = require('mongoose');
+const modelsBuilder = require('./../models/models_builder');
 
 module.exports.MongooseUtil = class MongooseUtil {
     /**
@@ -15,7 +15,7 @@ module.exports.MongooseUtil = class MongooseUtil {
     connectToDB() {
         return new Promise((resolve, reject) => {
             try {
-                mongoose.Promise = global.Promise;process.env.MONGO_URI
+                mongoose.Promise = global.Promise;
                 console.log('connect to: ', process.env.MONGO_URI);
                 this._db = mongoose.connect(process.env.MONGO_URI);
 

@@ -1,6 +1,5 @@
 const userService = require('./../servises/user');
 const cryptoFacade = require('./../facades/crypto');
-const _ = require('lodash');
 const allModels = require('./../models/models_builder').models;
 const accountSchema = require('./../models/account');
 const twitterProfileSchema = require('./../models/twitter_profile');
@@ -22,11 +21,11 @@ const buildSessionData = (account, twitterProfile) => {
 const service = {
     /**
      * That function is callback for passport local authorisation strategy
-     * @param username {string}
-     * @param password {string}
-     * @param done
+     * @param {string} username
+     * @param {string} password
+     * @param {function} done
      */
-    login: function (username, password, done) {
+    login: function(username, password, done) {
         let userModel = allModels[accountSchema.getSchemaName()];
         userModel
             .findOne({email: username, isActive: true})
@@ -45,42 +44,38 @@ const service = {
     },
     /**
      * That function is callback for passport twitter authorisation strategy
-     * @param token
-     * @param tokenSecret
-     * @param profile
-     * @param done
+     * @param {string} token
+     * @param {string} tokenSecret
+     * @param {object} profile
+     * @param {function} done
      */
     loginViaTwitter: (token, tokenSecret, profile, done) => {
         const queue = {token: token};
         let twitterProfileModel = allModels[twitterProfileSchema.getSchemaName()];
         twitterProfileModel
             .findOne(queue)
-            .populate('account') //TODO how remove hardcode?
+            .populate('account') // TODO how remove hardcode?
             .exec((err, foundProfile) => {
-                errorService.handleError(err, 500, "ER006", done);
+                errorService.handleError(err, 500, 'ER006', done);
                 const callback = (newUser, newProfile) => {
                     done(null, buildSessionData(newUser, newProfile));
                 };
                 if (foundProfile === null) {
                     userService.createNewProfileAndAccount(token, tokenSecret, profile, callback, done);
-                }
-                else {
+                } else {
                     if (foundProfile.account) {
                         callback(foundProfile.account, foundProfile);
-                    }
-                    else {
+                    } else {
                         userService.addAccountToTwitterProfile(foundProfile, callback, done);
                     }
                 }
-               
             });
     },
-    
     /**
      * Function for check is authorised user or not
-     * @param req
-     * @param res
-     * @param next
+     * @param {object} req data about request
+     * @param {object} res data about response
+     * @param {function} next function for call next middleware
      */
     loggedIn: (req, res, next) => {
         if (req.user) {
@@ -89,18 +84,15 @@ const service = {
             next(errorService.new(401));
         }
     },
-    
     loggedOut: (req) => {
         return new Promise((resolve, reject) => {
             try {
                 req.logout();
                 resolve();
+            } catch (error) {
+                reject(errorService.new(500, {code: 'ER002', reason: error}));
             }
-            catch (error) {
-                reject(errorService.new(500, {code: "ER002", reason: error}));
-            }
-            
         });
-    }
+    },
 };
 module.exports = service;

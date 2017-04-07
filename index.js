@@ -55,21 +55,18 @@ process.on('unhandledRejection', (reason, p) => {
 let server = app.listen(process.env.APP_PORT, function() {
     let host = server.address().address;
     let port = server.address().port;
-    console.log('Example app listening at http://%s:%s', host, port)
+    console.log('Example app listening at http://%s:%s', host, port);
 });
-
-/*
-    TODO:
-    1) Add comments
-    6) Add tests on endpoints
-    
-    7) Fix models, remove extra models logic,
-    8) Set database structure, set to twitterProfile -> account <- localProfile
-    9) Add check isActive function for twitter profile
-    10) add indexes for token in find twitter profile https://habrahabr.ru/post/192870/
-    
-    other features
-    1) Add docker with overrride file and config file
-    3) Add forgot password (with available email notifications) endpoints
-    5) ?
- */
+    // TODO:
+    // 1) Add comments
+    // 6) Add tests on endpoints
+    //
+    // 7) Fix models, remove extra models logic,
+    // 8) Set database structure, set to twitterProfile -> account <- localProfile
+    // 9) Add check isActive function for twitter profile
+    // 10) add indexes for token in find twitter profile https://habrahabr.ru/post/192870/
+    //
+    // other features
+    // 1) Add docker with overrride file and config file
+    // 3) Add forgot password (with available email notifications) endpoints
+    // 5) ?

@@ -1,7 +1,5 @@
-const authService = require('./../servises/auth')
-    , userService = require('./../servises/user')
-    , logger = require('./../utils/logger')
-    , errorService = require('./../utils/mongoose');
+const authService = require('./../servises/auth');
+const userService = require('./../servises/user');
 
 module.exports = {
     login: (req, res) => {
@@ -19,7 +17,7 @@ module.exports = {
             })
             .catch((error) => {
                 next(error);
-            })
+            });
     },
     logout: (req, res, next) => {
         authService.loggedOut(req)
@@ -28,7 +26,7 @@ module.exports = {
             })
             .catch((error) => {
                 next(error);
-            })
+            });
     },
     deleteAccount: (req, res, next) => {
         userService.deleteAccount(req.user)
@@ -37,6 +35,6 @@ module.exports = {
             })
             .catch((error) => {
                 next(error);
-        })
-    }
+        });
+    },
 };

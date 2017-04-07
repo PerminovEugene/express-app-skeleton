@@ -1,5 +1,5 @@
-const auth = require('./auth')
-    , home = require('./home');
+const auth = require('./auth');
+const home = require('./home');
 
 module.exports.addRoutes = (app) => {
     auth(app);
