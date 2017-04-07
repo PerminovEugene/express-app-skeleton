@@ -11,3 +11,12 @@ For install application locally:
     docker-compose up -d
     ...
 
+ 3. Set your git pre-commit file. 
+    You can find instructions in pre-commit.example file.
+    Also you must install eslint and eslint-config-google globally
+    ... 
+    npm i eslint --global
+    npm i eslint-config-google --global
+    ...
+    
+    
